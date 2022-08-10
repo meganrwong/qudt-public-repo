@@ -197,6 +197,43 @@ qudt:IdentifiersAndDescriptionsPropertyGroup
   rdfs:label "Identifiers and Descriptions" ;
   sh:order "10"^^xsd:decimal ;
 .
+qudt:InconsistentDimensionVectorSkosConstraint
+  a sh:NodeShape ;
+  rdfs:isDefinedBy <http://qudt.org/2.1/schema/shacl/overlay/qudt> ;
+  rdfs:label "Inconsistent DimensionVector SKOS constraint" ;
+  sh:sparql [
+      a sh:SPARQLConstraint ;
+      rdfs:comment "Checks equality of dimension vectors up the skos:broader hierarchy" ;
+      sh:message "Resource, {$this} has a different dimension vector from its skos:broader quantity kind, {?qk}" ;
+      sh:prefixes <http://qudt.org/2.1/schema/shacl/overlay/qudt> ;
+      sh:select """SELECT $this ?qk
+WHERE {
+$this qudt:hasDimensionVector  ?dv .
+$this skos:broader*/qudt:hasDimensionVector ?qdv .
+FILTER (?dv != ?qdv) .
+}""" ;
+    ] ;
+  sh:targetClass qudt:QuantityKind ;
+.
+qudt:InconsistentDimensionVectorUnitConstraint
+  a sh:NodeShape ;
+  rdfs:isDefinedBy <http://qudt.org/2.1/schema/shacl/overlay/qudt> ;
+  rdfs:label "Inconsistent DimensionVector Unit constraint" ;
+  sh:sparql [
+      a sh:SPARQLConstraint ;
+      rdfs:comment "Checks equality of dimension vectors between units and referred quantity kinds" ;
+      sh:message "Resource, {$this} has a different dimension vector from its quantity kind, {?qk}" ;
+      sh:prefixes <http://qudt.org/2.1/schema/shacl/overlay/qudt> ;
+      sh:select """SELECT $this ?qk
+WHERE {
+$this qudt:hasDimensionVector  ?udv .
+$this qudt:hasQuantityKind ?qk .
+?qk qudt:hasDimensionVector ?qdv .
+FILTER (?udv != ?qdv) .
+}""" ;
+    ] ;
+  sh:targetClass qudt:Unit ;
+.
 qudt:Narratable
   a qudt:AspectClass ;
   a sh:NodeShape ;
